@@ -1,0 +1,65 @@
+package abl.agents.generated;
+
+
+// imports
+import abl.wmes.*;
+import abl.actions.*;
+import abl.sensors.*;
+import abl.game.*;
+
+import java.lang.*;
+
+
+//Sleepy wird definiert
+behaving_entity Sleepy {
+
+	// Definition eines Slebskonflikts : Wenn eine consoleMessage ausgeführt wird kann keine weitere gleichzeitig ausgeführt werden.
+	conflict consoleMessage consoleMessage;
+	
+		
+	//Registration von Aktionen und Sensoren
+	register action consoleMessage() with ConsoleMessage;
+	register wme SleepySensor with SleepyWME;
+
+	//Definition von Verhaltensweisen.
+	sequential behavior sleep(){
+		
+		//Hier klemmt's Sensor WME Verbindung funktioniert nicht
+		precondition {
+		(SleepyWME tired == true)
+				
+		}
+		// Tritt diese Bedingung ein soll das hier ausgeführt werden.
+		act consoleMessage();
+	}
+	
+	//Ähnliches verhalten wie darüber nur, dass die Precondition anders ist.
+	sequential behavior notSleep(){
+		precondition{
+			(SleepyWME tired == false)
+		}
+		
+		act consoleMessage();
+	}
+		
+	
+	// Verhaltens-Baum wird ausgeführt
+	initial_tree {
+    	
+    	//Persistent sorgt dafür, dass das verhalten ständig versucht wird auszuführen.
+    	with (persistent) subgoal notSleep();
+    	with (persistent) subgoal sleep();
+    	
+    	//Mental act wird zur kosolenausgabe genutzt.
+        mental_act { 
+        
+        	// Ausgabe der Precondtion variable aus der "Game"-Umgebung
+        	System.out.println(SleepyGame.getInstance().getTiredGame() + " Sensor");
+        	
+        	//Einfach Ausgabe ob Sleepy initialisiert ist.
+        	System.out.println("Sleepy ist da");
+        }
+
+
+	}
+}
